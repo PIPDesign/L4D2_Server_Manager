@@ -1,0 +1,2 @@
+# L4D2_Server_Manager
+Ubuntu系统快速安装求生之路2的脚本
