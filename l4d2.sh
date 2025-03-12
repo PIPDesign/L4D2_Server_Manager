@@ -24,8 +24,21 @@ DIR="${STEAMCMD}/steamapps/common/L4D2-10-15"
 # 服务器名称列表
 NAMES=("L4d2-test" "L4d2-1" "L4d2-2" "L4d2-3" "L4d2-4" "L4d2-5" "L4d2-6" "L4d2-11" "L4d2-12" "L4d2-13" "L4d2-14" "L4d2-15")
 
-# 启动参数（与原脚本相同，省略以节省篇幅）
-PARAMS=(...)
+# 启动参数（示例，需根据实际需求填写完整）
+PARAMS=(
+    "-game left4dead2 +ip 0.0.0.0 +hostport 24099 +map c2m1_highway +sv_setmax 31 -tickrate 100 +exec server.cfg"
+    "-game left4dead2 +ip 0.0.0.0 +hostport 24001 +map c2m1_highway +sv_setmax 31 -tickrate 100 +exec server.cfg"
+    "-game left4dead2 +ip 0.0.0.0 +hostport 24002 +map c3m1_plankcountry +sv_setmax 31 -tickrate 100 +exec server.cfg"
+    "-game left4dead2 +ip 0.0.0.0 +hostport 24003 +map c5m1_waterfront +sv_setmax 31 -tickrate 100 +exec server.cfg"
+    "-game left4dead2 +ip 0.0.0.0 +hostport 24004 +map c6m1_riverbank +sv_setmax 31 -tickrate 100 +exec server.cfg"
+    "-game left4dead2 +ip 0.0.0.0 +hostport 24005 +map c7m1_docks +sv_setmax 31 -tickrate 100 +exec server.cfg"
+    "-game left4dead2 +ip 0.0.0.0 +hostport 24006 +map c8m1_apartment +sv_setmax 31 -tickrate 100 +exec server.cfg"
+    "-game left4dead2 +ip 0.0.0.0 +hostport 24011 +map c8m1_apartment +sv_setmax 31 -tickrate 100 +exec server.cfg"
+    "-game left4dead2 +ip 0.0.0.0 +hostport 24012 +map c8m1_apartment +sv_setmax 31 -tickrate 100 +exec server.cfg"
+    "-game left4dead2 +ip 0.0.0.0 +hostport 24013 +map c8m1_apartment +sv_setmax 31 -tickrate 100 +exec server.cfg"
+    "-game left4dead2 +ip 0.0.0.0 +hostport 24014 +map c8m1_apartment +sv_setmax 31 -tickrate 100 +exec server.cfg"
+    "-game left4dead2 +ip 0.0.0.0 +hostport 24015 +map c8m1_apartment +sv_setmax 31 -tickrate 100 +exec server.cfg"
+)
 
 # 关闭方式
 WAY=1  # 1 = screen指令关闭；2 = screen获取pid后kill；3 = ps获取pid后kill
@@ -105,7 +118,6 @@ function install_server() {
     fi
     trap 'rm -rf "${TMPDIR}"' EXIT
 
-    # 切换到 l4d2 用户安装 SteamCMD
     su - "${L4D2_USER}" -c "
         if [ -f \"${STEAMCMD}/steamcmd.sh\" ]; then
             echo -e \"\e[34mSteamCMD 已安装，跳过下载\e[0m\"
@@ -123,7 +135,6 @@ function install_server() {
             echo -e \"\e[92mSteamCMD 安装成功\e[0m\"
         fi
 
-        # 安装 L4D2 服务器
         if [ -f \"${DIR}/srcds_run\" ]; then
             echo -e \"\e[34mL4D2 服务器已安装，跳过安装\e[0m\"
         else
@@ -138,7 +149,7 @@ function install_server() {
     "
 }
 
-# 启动服务器的通用函数（在 l4d2 用户下执行）
+# 启动服务器
 function StartServer() {
     local name=$1
     local params=$2
@@ -162,9 +173,47 @@ function StartServer() {
     "
 }
 
-# 其他函数（如 CloseServer、ScreenCheckAll 等）类似地使用 su - "${L4D2_USER}" -c "..." 执行
+# 关闭服务器
+function CloseServer() {
+    local name=$1
+    su - "${L4D2_USER}" -c "
+        if screen -ls | grep -qE \"[0-9]+\\\\.${name}[[:space:]]\"; then
+            echo -e \"\e[34m关闭 ${name} 服务器中...\e[0m\"
+            screen -X -S \"${name}\" quit
+            sleep 1
+            if ! screen -ls | grep -qE \"[0-9]+\\\\.${name}[[:space:]]\"; then
+                echo -e \"\e[92m${name} 已关闭\e[0m\"
+            else
+                echo -e \"\e[31m${name} 关闭失败\e[0m\"
+            fi
+        else
+            echo -e \"\e[34m未找到名为 ${name} 的 screen 会话\e[0m\"
+        fi
+    "
+}
 
 # 主交互菜单
 function MainBody() {
     create_l4d2_user  # 确保 l4d2 用户存在
-    echo -e "\n\n\n###########[ \033[32mL4d2-批量启动特感速递服.sh
+    echo -e "\n\n\n###########[ \033[32mL4d2-批量启动特感速递服.sh\033[0m ]###########"
+    echo "00——安装运行依赖"
+    echo "01——安装服务器"
+    echo "02——开启测试服务器"
+    echo "03——关闭测试服务器"
+    echo "#################################################"
+    read -n 2 -p "请输入对应数字选择功能: " answer
+    echo
+    case ${answer} in
+        00) install_dependencies ;;
+        01) install_server ;;
+        02) StartServer "${NAMES[0]}" "${PARAMS[0]}" ;;
+        03) CloseServer "${NAMES[0]}" ;;
+        *)
+            echo -e "\e[31m未知指令，请重试\e[0m"
+            MainBody
+            ;;
+    esac
+}
+
+# 执行主函数
+MainBody
