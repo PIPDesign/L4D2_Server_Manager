@@ -130,7 +130,7 @@ function install_server() {
         echo -e "\e[34mL4D2 服务器已安装，跳过安装\e[0m"
     else
         echo -e "\e[34m安装 L4D2 服务器...\e[0m"
-        sudo -u l4d2 "${STEAM_DIR}/steamcmd.sh" +force_install_dir "${SERVER_DIR}" +login anonymous +app_update 222860 validate +quit
+        sudo -u l4d2 "${STEAM_DIR}/steamcmd.sh" +force_install_dir "${SERVER_DIR}" +login anonymous +@sSteamCmdForcePlatformType windows +app_update 222860 validate +quit
         if [ "${?}" -ne 0 ]; then
             echo -e "\e[31mL4D2 服务器安装失败，请检查网络或磁盘空间\e[0m"
             exit 1
