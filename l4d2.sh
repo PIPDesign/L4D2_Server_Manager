@@ -6,7 +6,7 @@ NAMES=("L4d2-test" "L4d2-1" "L4d2-2" "L4d2-3" "L4d2-4" "L4d2-5" "L4d2-6" "L4d2-1
 
 # 路径设置
 STEAM_DIR="/home/l4d2/Steam"
-SERVER_DIR="/home/l4d2/Steam/steamapps"
+SERVER_DIR="/home/l4d2/Steam/steamapps/L4D2"
 
 # 启动参数
 PARAMS=(
@@ -130,7 +130,9 @@ function install_server() {
         echo -e "\e[34mL4D2 服务器已安装，跳过安装\e[0m"
     else
         echo -e "\e[34m安装 L4D2 服务器...\e[0m"
-        sudo -u l4d2 "${STEAM_DIR}/steamcmd.sh" +force_install_dir "${SERVER_DIR}" +login anonymous +@sSteamCmdForcePlatformType windows +app_update 222860 validate +quit
+        sudo -u l4d2 "${STEAM_DIR}/steamcmd.sh" +force_install_dir "${SERVER_DIR}" +login anonymous +@sSteamCmdForcePlatformType windows +app_update 222860 validate +quit && \
+sudo -u l4d2 "${STEAM_DIR}/steamcmd.sh" +force_install_dir "${SERVER_DIR}" +login anonymous +@sSteamCmdForcePlatformType linux +app_update 222860 validate +quit
+
         if [ "${?}" -ne 0 ]; then
             echo -e "\e[31mL4D2 服务器安装失败，请检查网络或磁盘空间\e[0m"
             exit 1
@@ -212,7 +214,9 @@ function Update() {
         exit 1
     fi
     echo -e "\e[34m更新 L4D2 服务器...\e[0m"
-    sudo -u l4d2 ./steamcmd.sh +force_install_dir "$SERVER_DIR" +login anonymous +app_update 222860 validate +quit
+    sudo -u l4d2 "${STEAM_DIR}/steamcmd.sh" +force_install_dir "${SERVER_DIR}" +login anonymous +@sSteamCmdForcePlatformType windows +app_update 222860 validate +quit && \
+sudo -u l4d2 "${STEAM_DIR}/steamcmd.sh" +force_install_dir "${SERVER_DIR}" +login anonymous +@sSteamCmdForcePlatformType linux +app_update 222860 validate +quit
+
     if [ "${?}" -ne 0 ]; then
         echo -e "\e[31m更新失败，请检查网络或路径\e[0m"
     else
