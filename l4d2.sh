@@ -6,7 +6,7 @@ NAMES=("L4d2-test" "L4d2-1" "L4d2-2" "L4d2-3" "L4d2-4" "L4d2-5" "L4d2-6" "L4d2-1
 
 # 路径设置
 STEAM_DIR="/home/l4d2/Steam"
-SERVER_DIR="/home/l4d2/L4D2-Servers"
+SERVER_DIR="/home/l4d2/Steam/steamapps"
 
 # 启动参数
 PARAMS=(
