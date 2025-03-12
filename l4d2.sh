@@ -188,9 +188,9 @@ function CloseServer() {
     if screen -ls | grep -qE "[0-9]+\.${name}[[:space:]]"; then
         echo -e "\e[34m关闭 ${name} 服务器中...\e[0m"
         case $WAY in
-            1) screen -X -S "${name}" quit ;;
-            2) screen -ls | grep -E "[0-9]+\.${name}[[:space:]]" | awk -F . '{print $1}' | awk '{print $1}' | xargs kill ;;
-            3) ps aux | grep -v grep | grep SCREEN | grep srcds_run | grep "${name}" | awk '{print $2}' | xargs kill ;;
+            1) sudo -u l4d2 screen -X -S "${name}" quit ;;
+            2) screen -ls | grep -E "[0-9]+\.${name}[[:space:]]" | awk -F . '{print $1}' | awk '{print $1}' | xargs sudo kill ;;
+            3) ps aux | grep -v grep | grep SCREEN | grep srcds_run | grep "${name}" | awk '{print $2}' | xargs sudo kill ;;
             *) echo -e "\e[31m未指定关闭方式\e[0m" ;;
         esac
         sleep 1
@@ -312,13 +312,8 @@ function MainBody() {
     esac
 }
 
-# 创建用户和设置目录
+# 创建用户和设置目录（无论当前用户是谁）
 setup_user_and_dirs
 
-# 确保以 l4d2 用户运行
-if [ "$(whoami)" != "l4d2" ]; then
-    echo -e "\e[34m请使用 l4d2 用户运行此脚本\e[0m"
-    exit 1
-fi
-
+# 直接运行主菜单，无需检查用户
 MainBody
